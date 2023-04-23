@@ -1,3 +1,5 @@
+package retry;
+
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,7 +15,7 @@ import java.lang.reflect.Method;
 @Component
 public class RetryableAspect {
 
-    @Around("@annotation(Retryable)")
+    @Around("@annotation(retry.Retryable)")
     public Object retryMethod(ProceedingJoinPoint joinPoint) throws Throwable {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -48,15 +50,15 @@ public class RetryableAspect {
             }
         }
 
-        // @Retryable fail case
+        // @retry.Retryable fail case
 
         Object target = joinPoint.getTarget();
 
-        // Find @Recover method (@Retryable return type == @Recover return type)
+        // Find @retry.Recover method (@retry.Retryable return type == @retry.Recover return type)
         Method recoverMethod = findRecoverMethodWithSameReturnType(target, reatryableMethod.getReturnType());
 
         if (recoverMethod != null) {
-            log.info("Recover start");
+            log.info("retry.Recover start");
             // The exception occurring here is not retried.
             return recoverMethod.invoke(target);
         } else {
@@ -76,7 +78,7 @@ public class RetryableAspect {
     public Method findRecoverMethodWithSameReturnType(Object target, Class<?> retryableMethodReturnType) {
         Method[] methods = ReflectionUtils.getAllDeclaredMethods(target.getClass());
 
-        // Find @Recover annotation
+        // Find @retry.Recover annotation
         for (Method method : methods) {
             if (method.isAnnotationPresent(Recover.class) &&
                     method.getReturnType().equals(retryableMethodReturnType)) {
