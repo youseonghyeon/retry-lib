@@ -39,7 +39,9 @@ public class RetryableAspect {
                 return proceed;
             } catch (Exception e) {
                 lazyException = e;
-                if (isAssignable(e, annotation.include()) && !isAssignable(e, annotation.exclude())) {
+                boolean a = isAssignable(e, annotation.include());
+                boolean b = isAssignable(e, annotation.exclude());
+                if (a && !b) {
                     if (annotation.printStackTrace()) {
                         e.printStackTrace();
                     }
